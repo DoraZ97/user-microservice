@@ -79,11 +79,11 @@ def update_users(db_schema, table_name, tasks):
     conn = _get_db_connection()
     cur = conn.cursor()
 
-    sql = "Insert into " + db_schema + "." + table_name + " (ID, firstName, lastName, email, addressID) VALUES (" + id + ",'" + firstName + "','" + lastName + "','" + email + "'," + addressID + ")"
-    print(sql)
+    sql = "INSERT INTO " + db_schema + "." + table_name + " (ID, firstName, lastName, email, addressID) VALUES (%s, %s, %s, %s, %s)"
+    #sql = "Insert into " + db_schema + "." + table_name + " (ID, firstName, lastName, email, addressID) VALUES (" + id + ",'" + firstName + "','" + lastName + "','" + email + "'," + addressID + ")"
     print("SQL Statement = " + cur.mogrify(sql, None))
 
-    res = cur.execute(sql)
+    res = cur.execute(sql, (id, firstName, lastName, email, addressID))
     conn.commit()
     conn.close()
     return res
@@ -117,6 +117,23 @@ def get_address(db_schema, table_name):
 
     conn.close()
 
+    return res
+
+def update_email(db_schema, table_name, ID, email):
+    conn = _get_db_connection()
+    cur = conn.cursor()
+    print(ID)
+    print(email)
+
+    sql = "Update " + db_schema + "." + table_name + " SET email = %s WHERE ID = %s"
+    print("SQL Statement = " + cur.mogrify(sql, None))
+
+    res = cur.execute(sql, (email, ID))
+    res = cur.fetchall()
+    print(res)
+
+    conn.commit()
+    conn.close()
     return res
 
 

@@ -51,7 +51,7 @@ def get_artists_by_prefix(prefix):
     return rsp
 
 
-@app.route('/users', methods=["GET", "POST", "UPDATE"])
+@app.route('/users', methods=["GET", "POST"])
 def get_users():
     if request.method == 'GET':
         res = d_service.get_user("UserResource", "User")
@@ -75,8 +75,18 @@ def get_users():
             res = d_service.update_users("UserResource", "User", tasks)
             rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
         return rsp
-    if request.method == 'UPDATE':
-        data = request.form
+
+@app.route('/users/email', methods=["POST"])
+def update_email():
+    data = request.form
+    ID = data.get('ID')
+    email = data.get('email')
+    if ID is None:
+        rsp = Response(json.dumps(None), status=422, content_type="application/json")
+    else:
+        res = d_service.update_email("UserResource", "User", ID, email)
+        rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
+    return rsp
 
 
 @app.route('/users/<ID>', methods=["GET"])
