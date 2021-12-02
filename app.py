@@ -1,9 +1,11 @@
-from flask import Flask, Response
+from flask import Flask, Response, session, render_template
 import database_services.RDBService as d_service
 from flask_cors import CORS
 from flask import jsonify, request
 from flask import Flask, redirect, url_for
 from flask_dance.contrib.google import make_google_blueprint, google
+from middleware import security
+
 import json
 import os
 
@@ -13,10 +15,10 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-from application_services.imdb_artists_resource import IMDBArtistResource
-from application_services.UsersResource.user_service import UserResource
+# from application_services.imdb_artists_resource import IMDBArtistResource
+# from application_services.UsersResource.user_service import UserResource
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='template')
 CORS(app)
 
 # os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -29,7 +31,7 @@ CORS(app)
 #     scope=["profile", "email"]
 # )
 # app.register_blueprint(blueprint, url_prefix="/login")
-#
+
 # @app.route("/")
 # def index():
 #     if not google.authorized:
@@ -37,18 +39,34 @@ CORS(app)
 #     resp = google.get("/oauth2/v1/userinfo")
 #     assert resp.ok, resp.text
 #     return "You are {email} on Google".format(email=resp.json()["email"])
+#
 
+
+######################## Middleware ###########################################
+
+@app.before_request
+def before_request_func():
+    print("running before_request_func")
+    if not security.check_security(request, session):
+        return render_template('auth.html')
+
+@app.after_request
+def after_request_func(response):
+    print("running after_request_func")
+    return response
+
+############################################################################
 
 @app.route('/')
 def hello_world():
     return '<u>Hello World!</u>'
 
 
-@app.route('/imdb/artists/<prefix>')
-def get_artists_by_prefix(prefix):
-    res = IMDBArtistResource.get_by_name_prefix(prefix)
-    rsp = Response(json.dumps(res), status=200, content_type="application/json")
-    return rsp
+# @app.route('/imdb/artists/<prefix>')
+# def get_artists_by_prefix(prefix):
+#     res = IMDBArtistResource.get_by_name_prefix(prefix)
+#     rsp = Response(json.dumps(res), status=200, content_type="application/json")
+#     return rsp
 
 
 @app.route('/users', methods=["GET", "POST", "UPDATE"])
