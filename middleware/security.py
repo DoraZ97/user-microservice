@@ -1,4 +1,3 @@
-import json
 
 unsecure_path = {
     '/health': ['GET'],
@@ -14,7 +13,7 @@ def check_security(request, session):
     print("[security] requested path: ", path)
 
     # TODO: change uToken (which is from Google) to userId (assigned from our DB) to store in sessions
-    if path in unsecure_path and method in unsecure_path[path] or 'uToken' in session:
+    if path in unsecure_path and method in unsecure_path[path] or 'email' in session:
         return True
 
     return False

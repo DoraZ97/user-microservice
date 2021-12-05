@@ -62,14 +62,7 @@ def hello_world():
     return '<u>Hello World!</u>'
 
 
-# @app.route('/imdb/artists/<prefix>')
-# def get_artists_by_prefix(prefix):
-#     res = IMDBArtistResource.get_by_name_prefix(prefix)
-#     rsp = Response(json.dumps(res), status=200, content_type="application/json")
-#     return rsp
-
-
-@app.route('/users', methods=["GET", "POST"])
+@app.route('/api/users', methods=["GET", "POST"])
 def get_users():
     if request.method == 'GET':
         res = d_service.get_user("UserResource", "User")
@@ -94,7 +87,7 @@ def get_users():
             rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
         return rsp
 
-@app.route('/users/email', methods=["POST"])
+@app.route('/api/users/email', methods=["POST"])
 def update_email():
     data = request.form
     ID = data.get('ID')
@@ -107,7 +100,7 @@ def update_email():
     return rsp
 
 
-@app.route('/users/<ID>', methods=["GET"])
+@app.route('/api/users/<ID>', methods=["GET"])
 def get_users_by_ID(ID):
     res = d_service.get_userID("UserResource", "User", ID)
     if not res:
@@ -116,26 +109,18 @@ def get_users_by_ID(ID):
         rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
-@app.route('/users/<ID>/address', methods=["GET"])
+@app.route('/api/users/<ID>/address', methods=["GET"])
 def get_users_address_by_ID(ID):
     res = d_service.get_address_by_userID("UserResource", "User", "Address", ID)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
-@app.route('/address', methods=["GET"])
+@app.route('/api/address', methods=["GET"])
 def get_address():
     res = d_service.get_address("UserResource", "Address")
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
-
-
-
-# @app.route('/getUsers')
-# def get_by_prefix():
-#     res = d_service.get_user("UserResource", 'nameChart')
-#     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
-#     return rsp
 
 
 if __name__ == '__main__':
