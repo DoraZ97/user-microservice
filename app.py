@@ -65,7 +65,14 @@ def hello_world():
 @app.route('/api/users', methods=["GET", "POST"])
 def get_users():
     if request.method == 'GET':
-        res = d_service.get_user("UserResource", "User")
+        user_id = request.args.get('user_id')
+        res = None
+
+        if user_id:
+            res = d_service.get_userID("UserResource", "User", user_id)
+        else:
+            res = d_service.get_user("UserResource", "User")
+
         if not res:
             rsp = Response(json.dumps(res, default=str), status=404, content_type="application/json")
         else:
@@ -99,19 +106,22 @@ def update_email():
         rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
     return rsp
 
+#
+# @app.route('/api/users/<ID>', methods=["GET"])
+# def get_users_by_ID(ID):
+#     res = d_service.get_userID("UserResource", "User", ID)
+#     if not res:
+#         rsp = Response(json.dumps(res, default=str), status=404, content_type="application/json")
+#     else:
+#         rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+#     return rsp
 
-@app.route('/api/users/<ID>', methods=["GET"])
-def get_users_by_ID(ID):
-    res = d_service.get_userID("UserResource", "User", ID)
-    if not res:
-        rsp = Response(json.dumps(res, default=str), status=404, content_type="application/json")
-    else:
-        rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
-    return rsp
-
-@app.route('/api/users/<ID>/address', methods=["GET"])
-def get_users_address_by_ID(ID):
-    res = d_service.get_address_by_userID("UserResource", "User", "Address", ID)
+@app.route('/api/users/address', methods=["GET"])
+def get_users_address_by_ID():
+    user_id = request.args.get('user_id')
+    if not user_id:
+        raise Exception("[User.get_users_address_by_ID] Error parsing user_id from query selector.")
+    res = d_service.get_address_by_userID("UserResource", "User", "Address", user_id)
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
