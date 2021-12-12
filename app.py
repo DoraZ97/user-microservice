@@ -44,16 +44,16 @@ CORS(app)
 
 ######################## Middleware ###########################################
 
-@app.before_request
-def before_request_func():
-    print("running before_request_func")
-    if not security.check_security(request, session):
-        return render_template('auth.html')
-
-@app.after_request
-def after_request_func(response):
-    print("running after_request_func")
-    return response
+# @app.before_request
+# def before_request_func():
+#     print("running before_request_func")
+#     if not security.check_security(request, session):
+#         return render_template('auth.html')
+#
+# @app.after_request
+# def after_request_func(response):
+#     print("running after_request_func")
+#     return response
 
 ############################################################################
 
@@ -81,13 +81,13 @@ def get_users():
     if request.method == 'POST':
         data = request.form
         tasks = {
-            'ID': data.get('ID'),
             'firstName': data.get('firstName'),
             'lastName': data.get('lastName'),
+            'phone': data.get('phone'),
             'email': data.get('email'),
             'addressID': data.get('addressID')
         }
-        if tasks["ID"] is None or tasks["firstName"] is None or tasks["lastName"] is None or tasks["email"] is None or tasks["addressID"] is None:
+        if tasks["firstName"] is None or tasks["lastName"] is None or tasks["email"] is None or tasks["addressID"] is None:
             rsp = Response(json.dumps(None), status=400, content_type="application/json")
         else:
             res = d_service.update_users("UserResource", "User", tasks)
@@ -125,13 +125,52 @@ def get_users_address_by_ID():
     rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
     return rsp
 
-@app.route('/api/address', methods=["GET"])
+@app.route('/api/address', methods=["GET", "POST"])
 def get_address():
-    res = d_service.get_address("UserResource", "Address")
-    rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
-    return rsp
+    if request.method == "GET":
+        res = d_service.get_address("UserResource", "Address")
+        rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
+        return rspf
 
+    if request.method == 'POST':
+        data = request.form
+        tasks = {
+            'streetNo': data.get('streetNo'),
+            'streetName': data.get('streetName'),
+            'city': data.get('city'),
+            'region': data.get('region'),
+            'countryCode': data.get('countryCode'),
+            'postalCode': data.get('postalCode')
+        }
 
+        if tasks["streetNo"] is None or tasks["streetName"] is None or tasks[
+            "city"] is None or tasks["region"] is None or tasks["countryCode"] is None or tasks["postalCode"] is None:
+            rsp = Response(json.dumps(None), status=400, content_type="application/json")
+        else:
+            res = d_service.update_address("UserResource", "Address", tasks)
+            rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
+        return rsp
+
+# @app.route('/updateAddress', methods=["POST"])
+# def updateAddress():
+#     data = request.form
+#     tasks = {
+#         'ID': data.get('addressID'),
+#         'streetNo': data.get('streetNo'),
+#         'streetName': data.get('streetName'),
+#         'city': data.get('city'),
+#         'region': data.get('region'),
+#         'countryCode': data.get('countryCode'),
+#         'postalCode': data.get('postalCode')
+#     }
+#
+#     if tasks["ID"] is None or tasks["streetNo"] is None or tasks["streetName"] is None or tasks[
+#         "city"] is None or tasks["region"] is None or tasks["countryCode"] is None or tasks["postalCode"] is None:
+#         rsp = Response(json.dumps(None), status=400, content_type="application/json")
+#     else:
+#         res = d_service.update_address("UserResource", "Address", tasks)
+#         rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
+#     return rsp
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)

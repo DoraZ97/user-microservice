@@ -71,20 +71,60 @@ def get_userID(db_schema, table_name, ID):
 
 def update_users(db_schema, table_name, tasks):
     print(tasks)
-    id = tasks["ID"]
     firstName = tasks["firstName"]
     lastName = tasks["lastName"]
+    phone = tasks["phone"]
     email = tasks["email"]
     addressID = tasks["addressID"]
     conn = _get_db_connection()
     cur = conn.cursor()
 
-    sql = "INSERT INTO " + db_schema + "." + table_name + " (ID, firstName, lastName, email, addressID) VALUES (%s, %s, %s, %s, %s)"
+    sql = "INSERT INTO " + db_schema + "." + table_name + " (firstName, lastName, phone, email, addressID) VALUES (%s, %s, %s, %s, %s)"
     #sql = "Insert into " + db_schema + "." + table_name + " (ID, firstName, lastName, email, addressID) VALUES (" + id + ",'" + firstName + "','" + lastName + "','" + email + "'," + addressID + ")"
     print("SQL Statement = " + cur.mogrify(sql, None))
 
-    res = cur.execute(sql, (id, firstName, lastName, email, addressID))
+    res = cur.execute(sql, (firstName, lastName, phone, email, addressID))
     conn.commit()
+
+    sql1 = "SELECT MAX(ID) as ID FROM " + db_schema + "." + table_name
+    res = cur.execute(sql1)
+    res = cur.fetchall()
+    print(res)
+
+    sql2 = "select * from " + db_schema + "." + table_name + " where ID = %s"
+    print(sql2)
+    res = cur.execute(sql2, (res[0]["ID"]))
+    res = cur.fetchall()
+    print(res)
+    conn.close()
+    return res
+
+def update_address(db_schema, table_name, tasks):
+    streetNo = tasks["streetNo"]
+    streetName = tasks["streetName"]
+    city = tasks["city"]
+    region = tasks["region"]
+    countryCode = tasks["countryCode"]
+    postalCode = tasks["postalCode"]
+
+    conn = _get_db_connection()
+    cur = conn.cursor()
+
+    sql = "INSERT INTO " + db_schema + "." + table_name + " (streetNo, streetName, city, region, countryCode, postalCode) VALUES (%s, %s, %s, %s, %s, %s)"
+    cur.execute(sql, (streetNo, streetName, city, region, countryCode, postalCode))
+    conn.commit()
+
+    sql1 = "SELECT MAX(ID) as ID FROM " + db_schema + "." + table_name
+    res = cur.execute(sql1)
+    res = cur.fetchall()
+    print(res)
+
+    sql2 = "select * from " + db_schema + "." + table_name + " where ID = %s"
+    print(sql2)
+    res = cur.execute(sql2, (res[0]["ID"]))
+    res = cur.fetchall()
+    print(res)
+
     conn.close()
     return res
 

@@ -18,7 +18,8 @@
         'apiKey': 'AIzaSyAYohbsCktkdMB9epV-SsdP1b5BKz5K-v0',
         'clientId': '527863353433-cpj82bi1ai6nrde45om3lf7nes2tbdpp.apps.googleusercontent.com',
         'discoveryDocs': [discoveryUrl],
-        'scope': SCOPE
+        'scope': SCOPE,
+        'redirect_uri': 'google.com'
     }).then(function () {
       GoogleAuth = gapi.auth2.getAuthInstance();
 
@@ -62,9 +63,11 @@
       $('#revoke-access-button').css('display', 'inline-block');
       $('#auth-status').html('You are currently signed in and have granted ' +
           'access to this app.');
+      $('#back-button').css('display', 'inline-block');
     } else {
       $('#sign-in-or-out-button').html('Sign In/Authorize');
       $('#revoke-access-button').css('display', 'none');
+      $('#back-button').css('display', 'none');
       $('#auth-status').html('You have not authorized this app or you are ' +
           'signed out.');
     }
@@ -79,6 +82,10 @@
         style="margin-left: 25px">Sign In/Authorize</button>
 <button id="revoke-access-button"
         style="display: none; margin-left: 25px">Revoke access</button>
+{#<a href="link.html"><button>Visit Page Now</button></a>#}
+
+<a href="http://localhost:5500/index_login.html"><button id="back-button"
+    style="display: none; margin-left: 50px">Back</button></a>
 
 <div id="auth-status" style="display: inline; padding-left: 25px"></div><hr>
 
