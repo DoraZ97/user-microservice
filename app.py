@@ -5,6 +5,7 @@ from flask import jsonify, request
 from flask import Flask, redirect, url_for
 from flask_dance.contrib.google import make_google_blueprint, google
 from middleware import security
+import grequests
 
 import json
 import os
@@ -130,7 +131,7 @@ def get_address():
     if request.method == "GET":
         res = d_service.get_address("UserResource", "Address")
         rsp = Response(json.dumps(res, default=str), status=200, content_type="application/json")
-        return rspf
+        return rsp
 
     if request.method == 'POST':
         data = request.form
@@ -150,6 +151,74 @@ def get_address():
             res = d_service.update_address("UserResource", "Address", tasks)
             rsp = Response(json.dumps(res, default=str), status=201, content_type="application/json")
         return rsp
+
+@app.route('/register', methods=["POST"])
+def register():
+    data = request.form
+    tasks = {
+        'streetNo': data.get('streetNo'),
+        'streetName': data.get('streetName'),
+        'city': data.get('city'),
+        'region': data.get('region'),
+        'countryCode': data.get('countryCode'),
+        'postalCode': data.get('postalCode')
+    }
+    tasks_user = {
+        'firstName': data.get('firstName'),
+        'lastName': data.get('lastName'),
+        'phone': data.get('phone'),
+        'email': data.get('email')
+    }
+    res = d_service.update_address("UserResource", "Address", tasks)
+    addressID = res[0]['ID']
+    print(addressID)
+    tasks_user['addressID'] = addressID
+    print(tasks_user)
+    res = d_service.update_users("UserResource", "User", tasks_user)
+    print(res)
+
+    # response = app.response_class(
+    #     response=json.dumps(res),
+    #     status=201,
+    #     mimetype="application/json"
+    # )
+    rsp = Response(json.dumps(res), status=201, content_type="application/json")
+    return rsp
+
+@app.route('/getPorfile', methods=["GET"])
+def getProfileInfo():
+    user_id = request.args.get('user_id')
+    userInfo = "http://usersmicroservice-env.eba-2dzdt4iv.us-east-2.elasticbeanstalk.com/api/users?user_id="+user_id
+    print(userInfo)
+    mealCreated = "http://3.16.13.44:5001/api/creator_create_which_meal?creator_id="+user_id
+    print(mealCreated)
+    mealParticipate = "http://3.16.13.44:5001/api/participant_take_which_meal?participant_id="+user_id
+    print(mealParticipate)
+    url= [
+        userInfo,
+        mealCreated,
+        mealParticipate
+    ]
+
+    rs = (grequests.get(u) for u in url)
+    x = grequests.map(rs)
+    print(x)
+
+    result = dict()
+    for i in range(3):
+        if i == 0:
+            result["user_info"] = x[i].json()[0]
+        elif i == 1:
+            result["meal_created"] = x[i].json()[0]
+        else:
+            meal_id = x[i].json()[0]["meals_id"]
+            url = ["http://3.16.13.44:5001/api/meals?meal_id=" + str(meal_id)]
+            rs1 = (grequests.get(u) for u in url)
+            x1 = grequests.map(rs1)
+            result["participate_meal"] = x1[0].json()[0]
+    print(result)
+    rsp = Response(json.dumps(result), status=200, content_type="application/json")
+    return rsp
 
 # @app.route('/updateAddress', methods=["POST"])
 # def updateAddress():

@@ -70,7 +70,6 @@ def get_userID(db_schema, table_name, ID):
     return res
 
 def update_users(db_schema, table_name, tasks):
-    print(tasks)
     firstName = tasks["firstName"]
     lastName = tasks["lastName"]
     phone = tasks["phone"]
@@ -89,13 +88,10 @@ def update_users(db_schema, table_name, tasks):
     sql1 = "SELECT MAX(ID) as ID FROM " + db_schema + "." + table_name
     res = cur.execute(sql1)
     res = cur.fetchall()
-    print(res)
 
     sql2 = "select * from " + db_schema + "." + table_name + " where ID = %s"
-    print(sql2)
     res = cur.execute(sql2, (res[0]["ID"]))
     res = cur.fetchall()
-    print(res)
     conn.close()
     return res
 
@@ -117,7 +113,6 @@ def update_address(db_schema, table_name, tasks):
     sql1 = "SELECT MAX(ID) as ID FROM " + db_schema + "." + table_name
     res = cur.execute(sql1)
     res = cur.fetchall()
-    print(res)
 
     sql2 = "select * from " + db_schema + "." + table_name + " where ID = %s"
     print(sql2)

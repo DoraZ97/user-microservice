@@ -63,11 +63,9 @@
       $('#revoke-access-button').css('display', 'inline-block');
       $('#auth-status').html('You are currently signed in and have granted ' +
           'access to this app.');
-      $('#back-button').css('display', 'inline-block');
     } else {
       $('#sign-in-or-out-button').html('Sign In/Authorize');
       $('#revoke-access-button').css('display', 'none');
-      $('#back-button').css('display', 'none');
       $('#auth-status').html('You have not authorized this app or you are ' +
           'signed out.');
     }
@@ -84,8 +82,6 @@
         style="display: none; margin-left: 25px">Revoke access</button>
 {#<a href="link.html"><button>Visit Page Now</button></a>#}
 
-<a href="http://localhost:5500/index_login.html"><button id="back-button"
-    style="display: none; margin-left: 50px">Back</button></a>
 
 <div id="auth-status" style="display: inline; padding-left: 25px"></div><hr>
 
